@@ -267,7 +267,7 @@ See the complete example in:
 ## ✅ Checklist
 
 - ✅ Server runs successfully with `npm start` or `npm run dev`
-- ✅ Database connection established (prints "Connected to MongoDB")
+- ✅ Database connection established (prints "Database Connected")
 - ✅ Project structure follows MVC pattern
 - ✅ Environment variables managed via `.env` file
 - ✅ CORS middleware enabled for frontend requests
