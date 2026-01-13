@@ -65,7 +65,9 @@ class BaseService {
     try {
       const entity = await this.repository.findById(id, options);
       if (!entity) {
-        throw new Error('Resource not found');
+        const error = new Error('Resource not found');
+        error.statusCode = 404;
+        throw error;
       }
       return entity;
     } catch (error) {
@@ -98,7 +100,9 @@ class BaseService {
     try {
       const entity = await this.repository.updateById(id, data, options);
       if (!entity) {
-        throw new Error('Resource not found');
+        const error = new Error('Resource not found');
+        error.statusCode = 404;
+        throw error;
       }
       return entity;
     } catch (error) {
@@ -115,7 +119,9 @@ class BaseService {
     try {
       const entity = await this.repository.deleteById(id);
       if (!entity) {
-        throw new Error('Resource not found');
+        const error = new Error("Resource not found");
+        error.statusCode = 404;
+        throw error;
       }
       return entity;
     } catch (error) {
