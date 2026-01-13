@@ -56,7 +56,7 @@ let shuttingDown = false;
 async function main() {
   // Start backend if not already running
   if (!(await isPortOpen(backendPort))) {
-    const backend = startProcess('node', ['server.js'], {
+    const backend = startProcess("node", ["server.js"], {
       cwd: backendCwd,
       env: {
         ...process.env,
@@ -68,7 +68,8 @@ async function main() {
   }
 
   // Ensure Vite sees the API base url
-  const viteApiUrl = process.env.VITE_API_URL || `http://127.0.0.1:${backendPort}/api`;
+  const viteApiUrl =
+    process.env.VITE_API_URL || `http://127.0.0.1:${backendPort}/api`;
 
   // Start frontend if not already running
   if (!(await isPortOpen(frontendPort))) {
@@ -79,23 +80,39 @@ async function main() {
     };
 
     const frontend =
-      process.platform === 'win32'
+      process.platform === "win32"
         ? startProcess(
-            'cmd.exe',
-            ['/d', '/s', '/c', `npm run dev -- --port ${frontendPort} --host 127.0.0.1`],
+            "cmd.exe",
+            [
+              "/d",
+              "/s",
+              "/c",
+              `npm run dev -- --port ${frontendPort} --host 127.0.0.1`,
+            ],
             { cwd: frontendCwd, env }
           )
-        : startProcess('npm', ['run', 'dev', '--', '--port', String(frontendPort), '--host', '127.0.0.1'], {
-            cwd: frontendCwd,
-            env,
-          });
+        : startProcess(
+            "npm",
+            [
+              "run",
+              "dev",
+              "--",
+              "--port",
+              String(frontendPort),
+              "--host",
+              "127.0.0.1",
+            ],
+            {
+              cwd: frontendCwd,
+              env,
+            }
+          );
 
     children.push(frontend);
     await waitForPort(frontendPort, 60_000);
   }
 
   // Keep this process alive until Playwright stops it.
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     await new Promise((r) => setTimeout(r, 1_000));
   }

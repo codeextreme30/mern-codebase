@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import process from "node:process";
 
 const FRONTEND_PORT = process.env.FRONTEND_PORT || '5173';
 
