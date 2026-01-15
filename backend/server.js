@@ -4,6 +4,11 @@ import cors from 'cors';
 import connectDB, { disconnectDB } from './config/db.js';
 import errorHandler from './utils/errorHandler.js';
 import userRoutes from './routes/user.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+
+const swaggerDocument = YAML.load('./doc/auth-openapi.yaml');
 
 // Load environment variables
 dotenv.config();
@@ -30,7 +35,11 @@ app.get('/api/status', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+
+// Swagger UI for API docs
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // 404 handler
 app.use('*', (req, res) => {

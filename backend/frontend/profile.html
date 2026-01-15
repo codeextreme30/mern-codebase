@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Profile</title>
+  <style>body{font-family:Arial,Helvetica,sans-serif;max-width:680px;margin:24px auto;padding:12px}pre{background:#f5f5f5;padding:12px}</style>
+</head>
+<body>
+  <h2>الصفحة المحمية - الملف الشخصي</h2>
+  <div id="content">جارٍ التحميل...</div>
+  <script>
+    async function loadProfile() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        document.getElementById('content').innerHTML = '<p>غير مسموح - لم يتم تسجيل الدخول. <a href="/frontend/login.html">تسجيل الدخول</a></p>';
+        return;
+      }
+      try {
+        const res = await fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Failed');
+        document.getElementById('content').innerHTML = '<pre>' + JSON.stringify(json.data.user, null, 2) + '</pre>';
+      } catch (err) {
+        document.getElementById('content').innerHTML = '<p style="color:#b00">' + err.message + '</p>';
+      }
+    }
+    loadProfile();
+  </script>
+</body>
+</html>
