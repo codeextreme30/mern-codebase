@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-import api from "../services/api"; // Axios instance اللي عملناها في services/api.js
+import api from "../services/api";
 
 export default function Home() {
-  const [status, setStatus] = useState("Loading..."); // حالة الـ API
+  const [status, setStatus] = useState("Loading..."); 
 
   useEffect(() => {
-    // طلب GET لـ API /status
+
     api.get("/status")
       .then((res) => {
-        setStatus(res.data.message); // إذا نجح الطلب
+        setStatus(res.data.message); 
       })
       .catch((err) => {
-        setStatus("API Error");       // إذا صار خطأ
+        setStatus("API Error");       
         console.error(err);
       });
   }, []);

@@ -1,11 +1,13 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaGoogle, FaGithub, FaFacebookF } from "react-icons/fa";
 import logo from "../assets/code-extreme.jpg";
+import { useAuth } from "../hooks/AuthContext";
 
-export default function Register() {
+export default function  Register() {
   const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -17,6 +19,7 @@ export default function Register() {
   });
 
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -45,36 +48,44 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setApiError("");
+
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
+
     setErrors({});
     setLoading(true);
 
     try {
-      const res = await fetch("/api/register", {
+      const res = await fetch("https://example.com/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+        }),
       });
+
       const data = await res.json();
-      if (res.ok && data.token) {
-        localStorage.setItem("token", data.token);
-        navigate("/dashboard"); 
-      } else {
-        setErrors(data.errors || { api: data.message || "Registration failed" });
-      }
+
+      if (!res.ok) throw new Error(data.message || "Registration failed");
+
+      login(data.token); 
+      navigate("/"); 
     } catch (err) {
-      setErrors({ api: "Server error, try again later" });
+      setApiError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container min-vh-100 d-flex justify-content-center align-items-center">
+    <div className="container min-vh-100 mt-5 d-flex justify-content-center align-items-center">
       <div className="card p-4 shadow w-100" style={{ maxWidth: "700px" }}>
         <div className="text-center mb-4">
           <img src={logo} alt="logo" className="rounded-circle shadow" style={{ width: 90, height: 90, objectFit: "cover" }} />
@@ -82,14 +93,16 @@ export default function Register() {
           <h4 className="fw-bold mt-2">Register</h4>
         </div>
 
+        {apiError && <div className="alert alert-danger">{apiError}</div>}
+
         <form className="d-flex flex-column gap-3" onSubmit={handleSubmit}>
           <div className="d-flex gap-2">
             <div className="w-100">
               <input
                 type="text"
-                className={`form-control ${errors.firstName ? "is-invalid" : ""}`}
-                placeholder="First name"
                 name="firstName"
+                placeholder="First Name"
+                className={`form-control ${errors.firstName ? "is-invalid" : ""}`}
                 value={formData.firstName}
                 onChange={handleChange}
               />
@@ -98,9 +111,9 @@ export default function Register() {
             <div className="w-100">
               <input
                 type="text"
-                className={`form-control ${errors.lastName ? "is-invalid" : ""}`}
-                placeholder="Last name"
                 name="lastName"
+                placeholder="Last Name"
+                className={`form-control ${errors.lastName ? "is-invalid" : ""}`}
                 value={formData.lastName}
                 onChange={handleChange}
               />
@@ -110,9 +123,9 @@ export default function Register() {
 
           <input
             type="email"
-            className={`form-control ${errors.email ? "is-invalid" : ""}`}
-            placeholder="Email"
             name="email"
+            placeholder="Email"
+            className={`form-control ${errors.email ? "is-invalid" : ""}`}
             value={formData.email}
             onChange={handleChange}
           />
@@ -120,9 +133,9 @@ export default function Register() {
 
           <input
             type="email"
-            className={`form-control ${errors.confirmEmail ? "is-invalid" : ""}`}
-            placeholder="Confirm Email"
             name="confirmEmail"
+            placeholder="Confirm Email"
+            className={`form-control ${errors.confirmEmail ? "is-invalid" : ""}`}
             value={formData.confirmEmail}
             onChange={handleChange}
           />
@@ -130,9 +143,9 @@ export default function Register() {
 
           <input
             type="password"
-            className={`form-control ${errors.password ? "is-invalid" : ""}`}
-            placeholder="Password"
             name="password"
+            placeholder="Password"
+            className={`form-control ${errors.password ? "is-invalid" : ""}`}
             value={formData.password}
             onChange={handleChange}
           />
@@ -140,9 +153,9 @@ export default function Register() {
 
           <input
             type="password"
-            className={`form-control ${errors.confirmPassword ? "is-invalid" : ""}`}
-            placeholder="Confirm Password"
             name="confirmPassword"
+            placeholder="Confirm Password"
+            className={`form-control ${errors.confirmPassword ? "is-invalid" : ""}`}
             value={formData.confirmPassword}
             onChange={handleChange}
           />
@@ -150,20 +163,18 @@ export default function Register() {
 
           <div className="form-check">
             <input
-              className="form-check-input"
               type="checkbox"
-              id="accept"
               name="accept"
+              id="accept"
               checked={formData.accept}
               onChange={handleChange}
+              className="form-check-input"
             />
-            <label className="form-check-label" htmlFor="accept">
+            <label htmlFor="accept" className="form-check-label">
               Read and accept privacy policy
             </label>
             {errors.accept && <div className="text-danger">{errors.accept}</div>}
           </div>
-
-          {errors.api && <div className="text-danger">{errors.api}</div>}
 
           <button type="submit" className="btn btn-primary w-100" disabled={loading}>
             {loading ? "Registering..." : "Register"}
