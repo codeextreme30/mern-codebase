@@ -1,6 +1,17 @@
+/**
+ * @fileoverview Authentication Service
+ * @description Business logic for user authentication (register, login, token management)
+ * @author Yosra Ziad - Software Engineer
+ * @version 1.0.0
+ */
+
 import UserRepository from '../repositories/user.repository.js';
 import jwt from 'jsonwebtoken';
 
+/**
+ * Authentication Service Class
+ * Handles user registration, login, and JWT token management
+ */
 class AuthService {
   constructor() {
     this.userRepository = new UserRepository();
