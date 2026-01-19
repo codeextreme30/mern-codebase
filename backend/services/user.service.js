@@ -24,7 +24,9 @@ class UserService extends BaseService {
     // Check if user already exists
     const existingUser = await this.repository.findByEmail(userData.email);
     if (existingUser) {
-      throw new Error('User with this email already exists');
+      const error = new Error("User with this email already exists");
+      error.statusCode = 400;
+      throw error;
     }
 
     return await this.create(userData);
